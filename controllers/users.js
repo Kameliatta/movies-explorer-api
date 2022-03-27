@@ -96,7 +96,7 @@ module.exports.login = (req, res, next) => {
           );
           res.cookie('jwt', token, {
             maxAge: 3600000 * 24 * 7,
-            // secure: process.env.NODE_ENV !== 'development',
+            secure: process.env.NODE_ENV !== 'development',
             httpOnly: true,
             sameSite: 'none',
           });

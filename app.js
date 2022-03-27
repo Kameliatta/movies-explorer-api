@@ -17,7 +17,7 @@ const app = express();
 
 app.use(cookieParser());
 app.use(cors({
-  // origin: ['https://project-mesto.students.nomoredomains.xyz', 'http://project-mesto.students.nomoredomains.xyz'],
+  origin: ['https://movies-explo.nomoredomains.work', 'http://movies-explo.nomoredomains.work'],
   credentials: true,
 }));
 
