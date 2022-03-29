@@ -12,7 +12,7 @@ const SOLT_ROUND = 10;
 
 function checkError(user) {
   if (!user) {
-    throw new NotFoundError('Пользователь с указанным _id не найден');
+    throw new NotFoundError();
   }
 }
 
@@ -35,7 +35,7 @@ module.exports.updateProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Такой email уже используется'));
+        next(new ConflictError());
       } else {
         next(err);
       }
@@ -64,7 +64,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Такой пользователь уже существует'));
+        next(new ConflictError());
       } else {
         next(err);
       }
@@ -80,13 +80,13 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new UnauthorizedError('Неверный email или пароль');
+        throw new UnauthorizedError();
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new UnauthorizedError('Неверный email или пароль'));
+            return Promise.reject(new UnauthorizedError());
           }
 
           const token = jwt.sign(

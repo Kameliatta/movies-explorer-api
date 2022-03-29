@@ -5,12 +5,13 @@ const { ForbiddenError } = require('../utils/errors/forbidden-err');
 
 function catchError(card) {
   if (!card) {
-    throw new NotFoundError('Фильм с указанным _id не найден');
+    throw new NotFoundError();
   }
 }
 
 module.exports.getMovie = (req, res, next) => {
-  Movie.findById(req.user._id)
+  const owner = req.user._id;
+  Movie.find({ owner })
     .then((movies) => res.send(movies))
     .catch(next);
 };
@@ -46,7 +47,7 @@ module.exports.createMovie = (req, res, next) => {
   })
     .then((movie) => {
       if (!movie) {
-        throw new BadRequestError('Переданы некорректные данные при создании фильма');
+        throw new BadRequestError();
       }
       res.send(movie);
     })
@@ -65,7 +66,7 @@ module.exports.deleteMovie = (req, res, next) => {
           })
           .catch(next);
       } else {
-        throw new ForbiddenError('Вы не являетесь владельцем фильма');
+        throw new ForbiddenError();
       }
     })
     .catch(next);

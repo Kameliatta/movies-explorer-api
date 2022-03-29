@@ -1,7 +1,8 @@
 class ForbiddenError extends Error {
-  constructor(message) {
-    super(message);
+  constructor() {
+    super();
     this.statusCode = 403;
+    this.message = 'Вы не являетесь владельцем';
   }
 }
 

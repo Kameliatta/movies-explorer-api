@@ -3,17 +3,24 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const { errors, celebrate, Joi } = require('celebrate');
+const helmet = require('helmet');
+const { errors } = require('celebrate');
 const { auth } = require('./middlewares/auth');
-const { createUser, login } = require('./controllers/users');
+
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { checkErrors } = require('./middlewares/checkErrors');
 const { NotFoundError } = require('./utils/errors/not-found-err');
+const limiter = require('./utils/rateLimiter');
+
+const { NODE_ENV, MONGO_SERVER } = process.env;
 
 require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
+
+app.use(helmet());
 
 app.use(cookieParser());
 app.use(cors({
@@ -26,28 +33,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().trim(),
-  }),
-}), login);
+app.use(limiter);
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().trim(),
-  }),
-}), createUser);
-
-app.post('/signout', (req, res) => {
-  res.clearCookie('jwt');
-  return res.sendStatus(200);
-});
-
-app.use('/users', auth, require('./routes/users'));
-app.use('/movies', auth, require('./routes/movies'));
+app.use(require('./routes/index'));
 
 app.use(auth, (req, res, next) => {
   next(new NotFoundError('Роут не найден'));
@@ -57,19 +45,8 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'Произошла ошибка'
-        : message,
-    });
+app.use(checkErrors);
 
-  next();
-});
-
-mongoose.connect('mongodb://localhost:27017/moviesdb');
+mongoose.connect(NODE_ENV === 'production' ? MONGO_SERVER : 'mongodb://localhost:27017/moviesdb');
 
 app.listen(PORT);

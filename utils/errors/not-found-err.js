@@ -1,7 +1,8 @@
 class NotFoundError extends Error {
-  constructor(message) {
-    super(message);
+  constructor() {
+    super();
     this.statusCode = 404;
+    this.message = 'Объект с указанным _id не найден';
   }
 }
 
