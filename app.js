@@ -16,7 +16,7 @@ const { NODE_ENV, MONGO_SERVER } = process.env;
 
 require('dotenv').config();
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 
 const app = express();
 
@@ -24,7 +24,10 @@ app.use(helmet());
 
 app.use(cookieParser());
 app.use(cors({
-  origin: ['https://movies-explo.nomoredomains.work', 'http://movies-explo.nomoredomains.work'],
+  origin: [
+    'https://movies-explo.nomoredomains.work',
+    'http://movies-explo.nomoredomains.work',
+    'http://localhost:3000'],
   credentials: true,
 }));
 
