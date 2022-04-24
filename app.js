@@ -26,8 +26,7 @@ app.use(cookieParser());
 app.use(cors({
   origin: [
     'https://movies-explo.nomoredomains.work',
-    'http://movies-explo.nomoredomains.work',
-    'http://localhost:3000'],
+    'http://movies-explo.nomoredomains.work'],
   credentials: true,
 }));
 
